@@ -2,21 +2,21 @@ import os
 from pyrogram import Client, filters
 
 # -------------------------------
-# Telegram API
+# Telegram API setup
 # -------------------------------
 api_id = int(os.environ.get("API_ID"))
 api_hash = os.environ.get("API_HASH")
 bot_token = os.environ.get("BOT_TOKEN")
 
-OWNER_ID = 7681589139  # Replace with your Telegram ID
-CHANNEL_USERNAME = "@haklesh"  # Replace with your channel username or ID
+OWNER_ID = 7681589139  # Your personal Telegram ID
+CHANNEL_USERNAME = "@haklesh"  # Your channel username
 
 deleted_count = 0  # Global counter
 
 app = Client("delete_failed_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
 # -------------------------------
-# Helper: check if message is failed or uploading
+# Helper: check if message is target
 # -------------------------------
 def is_target_message(message):
     if message.text:
@@ -24,11 +24,11 @@ def is_target_message(message):
     return False
 
 # -------------------------------
-# Delete existing old messages
+# Delete old messages
 # -------------------------------
 async def delete_existing_messages():
     global deleted_count
-    async for message in app.iter_history(CHANNEL_USERNAME):
+    async for message in app.get_chat_history(CHANNEL_USERNAME):
         if is_target_message(message):
             try:
                 await message.delete()
@@ -49,10 +49,10 @@ async def delete_new_messages(client, message):
             deleted_count += 1
             print(f"Deleted new message: {message.message_id} | Total deleted: {deleted_count}")
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error deleting new message {message.message_id}: {e}")
 
 # -------------------------------
-# Owner commands
+# /status command - owner only
 # -------------------------------
 @app.on_message(filters.private & filters.command("status"))
 async def status(client, message):
@@ -61,6 +61,9 @@ async def status(client, message):
     else:
         await message.reply_text("❌ You are not authorized.")
 
+# -------------------------------
+# /reset command - owner only
+# -------------------------------
 @app.on_message(filters.private & filters.command("reset"))
 async def reset_counter(client, message):
     global deleted_count
