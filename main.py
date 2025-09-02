@@ -1,19 +1,18 @@
-import os
+import asyncio
 from pyrogram import Client, filters
 
 # -------------------------------
-# Telegram API setup
+# Telegram API & Userbot Setup
 # -------------------------------
-api_id = int(os.environ.get("API_ID"))
-api_hash = os.environ.get("API_HASH")
-bot_token = os.environ.get("BOT_TOKEN")
-
-OWNER_ID = 7681589139  # Your personal Telegram ID
-CHANNEL_USERNAME = "@haklesh"  # Your channel username
+api_id = int(input("23977225"))        # Telegram API ID
+api_hash = input("969c399e6aea5032314a2e17cab428be")         # Telegram API Hash
+PHONE_NUMBER = input("7300209558") # Telegram account phone
+OWNER_ID = int(input("7681589139")) # Personal Telegram ID
+CHANNEL_USERNAME = "@haklesh"                 # Channel username
 
 deleted_count = 0  # Global counter
 
-app = Client("delete_failed_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
+app = Client("userbot_session", api_id=api_id, api_hash=api_hash, phone_number=PHONE_NUMBER)
 
 # -------------------------------
 # Helper: check if message is target
@@ -26,9 +25,9 @@ def is_target_message(message):
 # -------------------------------
 # Delete old messages
 # -------------------------------
-async def delete_existing_messages():
+async def delete_old_messages():
     global deleted_count
-    async for message in app.get_chat_history(CHANNEL_USERNAME):
+    async for message in app.get_chat_history(CHANNEL_USERNAME, limit=None):
         if is_target_message(message):
             try:
                 await message.delete()
@@ -38,9 +37,9 @@ async def delete_existing_messages():
                 print(f"Error deleting message {message.message_id}: {e}")
 
 # -------------------------------
-# Delete new incoming messages
+# Delete new messages
 # -------------------------------
-@app.on_message(filters.channel)
+@app.on_message(filters.chat(CHANNEL_USERNAME))
 async def delete_new_messages(client, message):
     global deleted_count
     if is_target_message(message):
@@ -52,7 +51,7 @@ async def delete_new_messages(client, message):
             print(f"Error deleting new message {message.message_id}: {e}")
 
 # -------------------------------
-# /status command - owner only
+# Owner commands
 # -------------------------------
 @app.on_message(filters.private & filters.command("status"))
 async def status(client, message):
@@ -61,9 +60,6 @@ async def status(client, message):
     else:
         await message.reply_text("❌ You are not authorized.")
 
-# -------------------------------
-# /reset command - owner only
-# -------------------------------
 @app.on_message(filters.private & filters.command("reset"))
 async def reset_counter(client, message):
     global deleted_count
@@ -76,7 +72,11 @@ async def reset_counter(client, message):
 # -------------------------------
 # Run bot
 # -------------------------------
-app.start()
-app.loop.run_until_complete(delete_existing_messages())  # Delete old messages first
-print(f"✅ Finished deleting existing messages. Total deleted: {deleted_count}")
-app.idle()
+async def main():
+    await app.start()
+    print("✅ Userbot started. Deleting old messages...")
+    await delete_old_messages()
+    print(f"✅ Finished deleting old messages. Total deleted: {deleted_count}")
+    await app.idle()
+
+asyncio.run(main())
