@@ -562,22 +562,37 @@ async def upload(bot: Client, m: Message):
 
     
 
-    async def handle_thumbnail():
+    async def handle_thumbnail(editable, bot, links):
+    # Ask user for thumbnail
     await editable.edit(
-        "𝗡𝗼𝘄 𝗦𝗲𝗻𝗱 𝗧𝗵𝗲 𝗧𝗵𝘂𝗺𝗯 𝗨𝗿𝗹 …"
+        "𝗡𝗼𝘄 𝗦𝗲𝗻𝗱 𝗧𝗵𝘂𝗺𝗯 𝗨𝗿𝗹 𝗘𝗴 » "
+        "https://graph.org/file/13a89d77002442255efad-989ac290c1b3f13b44.jpg\n\n"
+        "𝗢𝗿 𝗜𝗳 𝗗𝗼𝗻'𝘁 𝗪𝗮𝗻𝘁 𝗧𝗵𝘂𝗺𝗯𝗻𝗮𝗶𝗹 𝗦𝗲𝗻𝗱 = 𝗻𝗼"
     )
+
+    # Listen for user input
     input6 = message = await bot.listen(editable.chat.id)
     raw_text6 = input6.text
     await input6.delete(True)
     await editable.delete()
 
-    thumb = "no"
+    # Handle thumbnail URL (optional)
+    thumb = raw_text6
+    if thumb.lower() == "no":
+        thumb = "no"
+    # Uncomment this if you want to download the image
+    # elif thumb.startswith("http://") or thumb.startswith("https://"):
+    #     getstatusoutput(f"wget '{thumb}' -O 'thumb.jpg'")
+    #     thumb = "thumb.jpg"
 
+    # Count links
     failed_count = 0
     if len(links) == 1:
         count = 1
     else:
-        count = int(raw_text6)
+        count = int(raw_text6)  # Or whatever the user sends for count
+
+    return thumb, count, failed_count
     try:
         for i in range(count - 1, len(links)):
             V = links[i][1].replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","") # .replace("mpd","m3u8")
