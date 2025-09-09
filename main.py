@@ -54,7 +54,7 @@ async def show_random_emojis(message):
     return emoji_message
     
 # Define the owner's user ID
-OWNER_ID = 5840594311 # Replace with the actual owner's user ID
+OWNER_ID = 7681589139 # Replace with the actual owner's user ID
 
 # List of sudo users (initially empty or pre-populated)
 SUDO_USERS = [5840594311]
@@ -573,7 +573,7 @@ async def upload(bot: Client, m: Message):
         #getstatusoutput(f"wget '{thumb}' -O 'thumb.jpg'")
         #thumb = "thumb.jpg"
     else:
-        thumb == "no"
+        thumb = "no"
     failed_count =0
     if len(links) == 1:
         count = 1
